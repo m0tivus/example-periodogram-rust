@@ -4,7 +4,7 @@ A periodogram for irregularly sampled time series based on the information theor
 
 ## Run with
 
-  cargo run --release
+    cargo run --release
   
 ## Notes
 
