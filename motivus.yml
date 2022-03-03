@@ -1,9 +1,9 @@
 version: 1.0
 
 build:
-  compiler: mvrc
-  source: .
-  filesystem: .
+  compiler: mvr
+  source: ./
+  filesystem: ./filesystem
 
 package:
   name: periodogram
