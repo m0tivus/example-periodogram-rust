@@ -14,24 +14,6 @@ mod kernels;
 mod information_theory;
 mod utils;
 
-fn renyi_periodogram(time: &DVector<f32>, magn: &DVector<f32>, freq_start: f32, freq_end: f32, freq_step: f32, alpha: f32){
-    let n = time.len();
-    let nfreq = ((freq_end - freq_start)/freq_step) as u32;
-    let gram_magn = kernels::lower_triangular_gram_matrix(magn, kernels::gaussian_kernel_fn(1.0));
-    let entropy_magn = information_theory::renyi_gram_entropy(gram_magn.clone(), n as f32, alpha);
-    let compute_single_frequency = | freq_idx: u32 | -> f32 {
-        let freq = freq_start + freq_step*(freq_idx as f32);
-        let phase = DVector::<f32>::from_fn(n, |i, _j| (time[i]%(1.0/freq))*freq);
-        let gram_phase = kernels::lower_triangular_gram_matrix(&phase, kernels::periodic_kernel_fn(1.0, 1.0));
-        let entropy_phase = information_theory::renyi_gram_entropy(gram_phase.clone(), n as f32, alpha);
-        let joint_entropy = information_theory::renyi_gram_joint_entropy(gram_phase, gram_magn.clone(), n as f32, alpha);
-        entropy_magn + entropy_phase - joint_entropy
-    };   
-
-    let periodogram = (0..nfreq).map(compute_single_frequency).collect::<Vec<f32>>();
-    println!("{:?}", periodogram);
-}
-
 #[derive(Debug, Deserialize)]
 struct LightCurve {
     mjd: Vec<f32>,
@@ -39,10 +21,24 @@ struct LightCurve {
     err: Vec<f32>,
 }
 
-fn read_json_light_curve_file<P: AsRef<Path>>(path: P) -> LightCurve {
-    let mut s = String::new();
-    File::open(path).unwrap().read_to_string(&mut s).unwrap();
-    serde_json::from_str(&s).unwrap()
+fn renyi_periodogram(light_curve: LightCurve, freq_start: f32, freq_end: f32, freq_step: f32, alpha: f32) -> Vec<f32>{
+    let mjd = DVector::<f32>::from_vec(light_curve.mjd);
+    let mag = DVector::<f32>::from_vec(light_curve.mag);
+    let _err = DVector::<f32>::from_vec(light_curve.err);
+    let n = mjd.len();
+    let nfreq = ((freq_end - freq_start)/freq_step) as u32;
+    let gram_mag = kernels::lower_triangular_gram_matrix(&mag, kernels::gaussian_kernel_fn(1.0));
+    let entropy_mag = information_theory::renyi_gram_entropy(gram_mag.clone(), n as f32, alpha);
+    let compute_single_frequency = | freq_idx: u32 | -> f32 {
+        let freq = freq_start + freq_step*(freq_idx as f32);
+        let phase = DVector::<f32>::from_fn(n, |i, _j| (mjd[i]%(1.0/freq))*freq);
+        let gram_phase = kernels::lower_triangular_gram_matrix(&phase, kernels::periodic_kernel_fn(1.0, 1.0));
+        let entropy_phase = information_theory::renyi_gram_entropy(gram_phase.clone(), n as f32, alpha);
+        let joint_entropy = information_theory::renyi_gram_joint_entropy(gram_phase, gram_mag.clone(), n as f32, alpha);
+        entropy_mag + entropy_phase - joint_entropy
+    };   
+
+    (0..nfreq).map(compute_single_frequency).collect::<Vec<f32>>()
 }
 
 /*
@@ -54,12 +50,27 @@ fn periodogram_random(){
 */
 
 #[wasm_bindgen]
-pub fn periodogram_json(freq_start: f32, freq_end: f32, freq_step: f32, alpha: f32){
+pub fn periodogram_js(light_curve: &JsValue, freq_start: &JsValue, freq_end: &JsValue, freq_step: &JsValue, alpha: &JsValue) -> String {
     utils::set_panic_hook();
+    let light_curve: LightCurve = light_curve.into_serde().unwrap();
+    let freq_start: f32 = freq_start.as_f64().unwrap() as f32;
+    let freq_end: f32 = freq_end.as_f64().unwrap() as f32;
+    let freq_step: f32 = freq_step.as_f64().unwrap() as f32;
+    let alpha: f32 = alpha.as_f64().unwrap() as f32;
+    let periodogram: Vec<f32> = renyi_periodogram(light_curve, freq_start, freq_end, freq_step, alpha);
+    format!("{:?}", periodogram)
+    
+}
+
+fn read_json_light_curve_file<P: AsRef<Path>>(path: P) -> LightCurve {
+    let mut s = String::new();
+    File::open(path).unwrap().read_to_string(&mut s).unwrap();
+    serde_json::from_str(&s).unwrap()
+}
+
+pub fn periodogram_json(freq_start: f32, freq_end: f32, freq_step: f32, alpha: f32){
     let path = Path::new("example.json");
     let light_curve = read_json_light_curve_file(path);
-    let mjd = DVector::<f32>::from_vec(light_curve.mjd);
-    let mag = DVector::<f32>::from_vec(light_curve.mag);
-    let _err = DVector::<f32>::from_vec(light_curve.err);
-    renyi_periodogram(&mjd, &mag, freq_start, freq_end, freq_step, alpha)
+    let periodogram: Vec<f32> = renyi_periodogram(light_curve, freq_start, freq_end, freq_step, alpha);
+    println!("{:?}", periodogram);
 }
