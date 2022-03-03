@@ -9,8 +9,12 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 path = "src/periodogram.rs"
 
+[features]
+default = ["console_error_panic_hook"]
+
 [dependencies]
-wasm-bindgen = "0.2"
+wasm-bindgen = "0.2.63"
+console_error_panic_hook = { version = "0.1.6", optional = true }
 nalgebra = "0.30.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"

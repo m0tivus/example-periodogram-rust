@@ -10,8 +10,9 @@ use serde::{Deserialize};
 use wasm_bindgen::prelude::*;
 
 use nalgebra::{DVector};
-pub mod kernels;
-pub mod information_theory;
+mod kernels;
+mod information_theory;
+mod utils;
 
 fn renyi_periodogram(time: &DVector<f32>, magn: &DVector<f32>, freq_start: f32, freq_end: f32, freq_step: f32, alpha: f32){
     let n = time.len();
@@ -54,6 +55,7 @@ fn periodogram_random(){
 
 #[wasm_bindgen]
 pub fn periodogram_json(freq_start: f32, freq_end: f32, freq_step: f32, alpha: f32){
+    utils::set_panic_hook();
     let path = Path::new("example.json");
     let light_curve = read_json_light_curve_file(path);
     let mjd = DVector::<f32>::from_vec(light_curve.mjd);
