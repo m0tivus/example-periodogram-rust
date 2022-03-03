@@ -2,9 +2,13 @@
 
 A periodogram for irregularly sampled time series based on the information theoretic concept of mutual information implemented in Rust
 
-## Run with
+## Build and run
 
-    cargo run --release
+Build with
+
+    ~/.cargo/bin/wasm-pack build --release --target no-modules --verbose
+
+Then open index.html with a browser
   
 ## Notes
 
