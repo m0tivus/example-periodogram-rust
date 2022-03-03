@@ -50,7 +50,7 @@ fn periodogram_random(){
 */
 
 #[wasm_bindgen]
-pub fn periodogram_js(light_curve: &JsValue, freq_start: f32, freq_end: f32, freq_step: f32, alpha: f32) -> String {
+pub fn main(light_curve: &JsValue, freq_start: f32, freq_end: f32, freq_step: f32, alpha: f32) -> String {
     utils::set_panic_hook();
     let light_curve: LightCurve = light_curve.into_serde().unwrap();
     let periodogram: Vec<f32> = renyi_periodogram(light_curve, freq_start, freq_end, freq_step, alpha);
