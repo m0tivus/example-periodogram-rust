@@ -12,9 +12,7 @@ Then launch a server with
 
     python -m http.server
 
-And point your browser to 
-
-    http://0.0.0.0:8000/
+And point your browser to: http://0.0.0.0:8000/
   
 ## Notes
 
