@@ -1,0 +1,17 @@
+version: 1.0
+
+build:
+  compiler: mvrc
+  source: .
+  filesystem: .
+
+package:
+  name: periodogram
+  version: 0.0.1
+  metadata:
+      short_description: "A periodogram for irregularly sampled time series"
+      license: "MIT"
+      author: "Motivus"
+      url: "https://motivus.cl/"
+      upstream_url: "https://github.com/m0tivus/example-periodogram-rust"
+      long_description: "A periodogram for irregularly sampled time series based on the information theoretic conc    ept of mutual information implemented in Rust"
