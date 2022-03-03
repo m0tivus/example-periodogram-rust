@@ -26,7 +26,7 @@ $(objdir)/%_mi.o : $(SOURCE_DIR)/%.c
 # This is SPQR_mMC compilation description extracted from spqr/src/Makefile.in
 # The compiler backend, different output file and additional emscripten flags are defined
 app:
-	wasm-pack build --target no-modules --verbose --out-name $(PACKAGE) --out-dir $(BUILD_DIR)
+	wasm-pack build --target no-modules --release --verbose --out-name $(PACKAGE) --out-dir $(BUILD_DIR)
 	#$(PREFIXED_OBJ_FILES)
 	#$(ECC) $(CFLAGS) $(PREFIXED_OBJ_FILES) -DFROZEN -DSPQR_DATA=$(datadir)/spqr -o $(BUILD_DIR)/$(PACKAGE).js -lm --preload-file $(FILESYSTEM_DIR)@/ -s ASSERTIONS=1 -s ALLOW_MEMORY_GROWTH=1 -s EXPORTED_RUNTIME_METHODS=FS,PATH 
 # END app specific
