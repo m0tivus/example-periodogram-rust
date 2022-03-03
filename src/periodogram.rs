@@ -50,13 +50,9 @@ fn periodogram_random(){
 */
 
 #[wasm_bindgen]
-pub fn periodogram_js(light_curve: &JsValue, freq_start: &JsValue, freq_end: &JsValue, freq_step: &JsValue, alpha: &JsValue) -> String {
+pub fn periodogram_js(light_curve: &JsValue, freq_start: f32, freq_end: f32, freq_step: f32, alpha: f32) -> String {
     utils::set_panic_hook();
     let light_curve: LightCurve = light_curve.into_serde().unwrap();
-    let freq_start: f32 = freq_start.as_f64().unwrap() as f32;
-    let freq_end: f32 = freq_end.as_f64().unwrap() as f32;
-    let freq_step: f32 = freq_step.as_f64().unwrap() as f32;
-    let alpha: f32 = alpha.as_f64().unwrap() as f32;
     let periodogram: Vec<f32> = renyi_periodogram(light_curve, freq_start, freq_end, freq_step, alpha);
     format!("{:?}", periodogram)
     
@@ -68,9 +64,11 @@ fn read_json_light_curve_file<P: AsRef<Path>>(path: P) -> LightCurve {
     serde_json::from_str(&s).unwrap()
 }
 
-pub fn periodogram_json(freq_start: f32, freq_end: f32, freq_step: f32, alpha: f32){
-    let path = Path::new("example.json");
+#[wasm_bindgen]
+pub fn periodogram_json(file_name: String, freq_start: f32, freq_end: f32, freq_step: f32, alpha: f32) -> String{
+    utils::set_panic_hook();
+    let path = Path::new(&file_name);
     let light_curve = read_json_light_curve_file(path);
     let periodogram: Vec<f32> = renyi_periodogram(light_curve, freq_start, freq_end, freq_step, alpha);
-    println!("{:?}", periodogram);
+    format!("{:?}", periodogram)
 }

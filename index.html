@@ -5,12 +5,13 @@
   <body>
     <script src='./pkg/example_periodogram_rust.js'></script>
     <script>
-	const { periodogram_js } = wasm_bindgen;
+	const { periodogram_js, periodogram_json } = wasm_bindgen;
 
 	async function run() {
 	   await wasm_bindgen('./pkg/example_periodogram_rust_bg.wasm');
 	   let light_curve = [[0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3]]
            const result = periodogram_js(light_curve, 0.1, 1.0, 0.1, 1.01);
+           //const result = periodogram_json("example.json", 0.1, 1.0, 0.1, 1.01);
 	   console.log(result);
            
          }
