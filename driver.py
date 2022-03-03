@@ -6,8 +6,8 @@ from light_curve_utils import light_curve_to_json
 async def main():
 
     task_definition = {
-        'wasm_path': './pkg/example_periodogram_rust_bg.wasm',
-        'loader_path': '',
+        'wasm_path': './build/periodogram-0.0.wasm',
+        'loader_path': './build/periodogram-0.0.js',
         'params': [
             light_curve_to_json("data/OGLE-LMC-RCB-01.dat"),
             0.1, 1.0, 0.1, 1.01
@@ -16,8 +16,8 @@ async def main():
 
     motivus = await Client.connect()
 
-    task_id = conn.call_async(task_definition)
-    task = conn.select_task(task_id)
+    task_id = motivus.call_async(task_definition)
+    task = motivus.select_task(task_id)
     result = await task
 
     print(result)
