@@ -6,7 +6,7 @@ build:
   filesystem: .
 
 package:
-  name: periodogram
+  name: it-periodogram
   version: 0.0.1
   metadata:
       short_description: "A periodogram for irregularly sampled time series"
